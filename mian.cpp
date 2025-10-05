@@ -35,7 +35,21 @@ public:
 };
 
 int main() {
-    TrackingClass<int, int, int> tracker([](int x, int y) { return x + y; }); // Default init
+
+    //if the assert statments are all running and going through, that means everything is good
+    TrackingClass<int, int, int> testTracker([](int a, int b) { return a + b; });
+    assert(testTracker.getCount() == 0);              
+    assert(testTracker.apply(2, 3) == 5);             
+    assert(testTracker.getLastResult() == 5);         
+    assert(testTracker.getCount() == 1);              
+
+    testTracker.setFunction([](int a, int b) { return a * b; });
+    assert(testTracker.apply(4, 2) == 8);             
+    assert(testTracker.getLastResult() == 8);        
+
+
+    //if the asserts pass, code starts right here
+    TrackingClass<int, int, int> tracker([](int x, int y) { return x + y; }); 
     bool yn = true;
 
     while (yn) {
