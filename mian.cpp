@@ -2,9 +2,9 @@
 #include <functional>
 #include <cassert>
 
+using namespace std;
+
 template<typename X, typename Y, typename Result>
-
-
 class TrackingClass {
 private:
     std::function<Result(X, Y)> func;
@@ -28,44 +28,63 @@ public:
     Result getLastResult() const {
         return lastResult;
     }
+
+    void setFunction(std::function<Result(X, Y)> f) {
+        func = f;
+    }
 };
 
 int main() {
-    
-    char op;
-    std::cout << "Choose an operation (+, -, *, /): ";
-    std::cin >> op;
+    TrackingClass<int, int, int> tracker([](int x, int y) { return x + y; }); // Default init
+    bool yn = true;
 
-    std::function<int(int, int)> selectedFunc;
+    while (yn) {
+        char op;
+        std::cout << "\nChoose an operation (+, -, *, /): ";
+        std::cin >> op;
 
-    if (op == '+') {
-        selectedFunc = [](int x, int y) { return x + y; };
-    } else if (op == '-') {
-        selectedFunc = [](int x, int y) { return x - y; };
-    } else if (op == '*') {
-        selectedFunc = [](int x, int y) { return x * y; };
-    } else if (op == '/') {
-        selectedFunc = [](int x, int y) {
-            if (y == 0) {
-                std::cout << "Error: Division by zero!\n";
-                return 0;
-            }
-            return x / y;
-        };
-    } else {
-        std::cout << "Invalid operation.\n";
-        return 1;
+        std::function<int(int, int)> selectedFunc;
+
+        if (op == '+') {
+            selectedFunc = [](int x, int y) { return x + y; };
+        } else if (op == '-') {
+            selectedFunc = [](int x, int y) { return x - y; };
+        } else if (op == '*') {
+            selectedFunc = [](int x, int y) { return x * y; };
+        } else if (op == '/') {
+            selectedFunc = [](int x, int y) {
+                if (y == 0) {
+                    std::cout << "Error: Division by zero!\n";
+                    return 0;
+                }
+                return x / y;
+            };
+        } else {
+            std::cout << "Invalid operation.\n";
+            continue; 
+        }
+
+        tracker.setFunction(selectedFunc);  
+
+        int x, y;
+        std::cout << "Enter two numbers: ";
+        std::cin >> x >> y;
+
+        int result = tracker.apply(x, y);
+        std::cout << "Result: " << result << "\n";
+        std::cout << "Function was applied " << tracker.getCount() << " time(s).\n";
+
+        string yesno;
+        cout << "Would you like to run the function again? (y/n): ";
+        cin >> yesno;
+
+        while (yesno != "y" && yesno != "n") {
+            cout << "Invalid input. Please enter 'y' or 'n': ";
+            cin >> yesno;
+        }
+
+        yn = (yesno == "y");
     }
-
-    TrackingClass<int, int, int> tracker(selectedFunc);
-
-    int x, y;
-    std::cout << "Enter two numbers: ";
-    std::cin >> x >> y;
-
-    int result = tracker.apply(x, y);
-    std::cout << "Result: " << result << "\n";
-    std::cout << "Function was applied " << tracker.getCount() << " time(s).\n";
 
     return 0;
 }
